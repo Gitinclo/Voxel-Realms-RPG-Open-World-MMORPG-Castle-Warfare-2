@@ -1,0 +1,522 @@
+@import "tailwindcss";
+@import url('https://fonts.googleapis.com/css2?family=Cinzel:wght@600;800&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@500;700&display=swap');
+
+:root {
+  --bg-obsidian: rgba(11, 15, 25, 0.9);
+  --bg-panel: rgba(17, 24, 39, 0.92);
+  --border-gold: rgba(245, 158, 11, 0.42);
+  --accent-gold: #f59e0b;
+  --accent-cyan: #38bdf8;
+  --accent-crimson: #ef4444;
+  --accent-emerald: #10b981;
+  --text-ivory: #f8fafc;
+  --text-muted: #94a3b8;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html,
+body {
+  width: 100%;
+  height: 100dvh;
+  margin: 0;
+  padding: 0;
+  overflow: hidden;
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+  background-color: #070b14;
+  color: var(--text-ivory);
+  user-select: none;
+  overscroll-behavior: none;
+}
+
+canvas {
+  display: block;
+}
+
+.font-display {
+  font-family: 'Cinzel', Georgia, serif;
+}
+
+.font-mono-num {
+  font-family: 'JetBrains Mono', monospace;
+  font-variant-numeric: tabular-nums;
+}
+
+/* Keep XRBlocks built-in XR entry button accessible in bottom-right without covering Title or HUD */
+#XRButtonWrapper {
+  position: fixed !important;
+  bottom: 14px !important;
+  right: 14px !important;
+  top: auto !important;
+  left: auto !important;
+  width: auto !important;
+  height: auto !important;
+  z-index: 35 !important;
+  display: flex !important;
+  flex-direction: row !important;
+  align-items: center !important;
+  gap: 8px !important;
+  pointer-events: none;
+}
+
+#XRButtonWrapper h1 {
+  display: none !important;
+}
+
+.XRButton {
+  pointer-events: auto;
+  background: linear-gradient(135deg, #fbbf24 0%, #d97706 100%) !important;
+  color: #090d16 !important;
+  border: 1px solid rgba(255, 255, 255, 0.35) !important;
+  border-radius: 10px !important;
+  font-family: 'Inter', sans-serif !important;
+  font-weight: 700 !important;
+  font-size: 0.78rem !important;
+  padding: 8px 14px !important;
+  min-width: auto !important;
+  gap: 8px !important;
+  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.5) !important;
+}
+
+.XRButton::after {
+  width: 16px !important;
+  height: 16px !important;
+}
+
+/* Title Screen Overlay */
+#title-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 40;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  padding: 24px;
+  background: radial-gradient(
+    circle at 50% 45%,
+    rgba(7, 11, 20, 0.38) 0%,
+    rgba(7, 11, 20, 0.86) 80%
+  );
+  transition: opacity 0.25s ease;
+}
+
+.hidden-overlay {
+  display: none !important;
+  opacity: 0 !important;
+  pointer-events: none !important;
+}
+
+#state-modal {
+  position: fixed;
+  inset: 0;
+  z-index: 50;
+  background: rgba(4, 7, 15, 0.82);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 20px;
+}
+
+#title-overlay.hidden-overlay {
+  opacity: 0;
+  pointer-events: none;
+  display: none !important;
+}
+
+.title-card {
+  max-width: 660px;
+  width: 100%;
+  background: rgba(11, 15, 25, 0.9);
+  border: 1px solid var(--border-gold);
+  border-radius: 16px;
+  padding: 32px 28px;
+  text-align: center;
+  box-shadow: 0 24px 60px rgba(0, 0, 0, 0.75);
+}
+
+.title-eyebrow {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 0.75rem;
+  font-weight: 700;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--accent-gold);
+  margin-bottom: 10px;
+}
+
+.title-heading {
+  font-family: 'Cinzel', Georgia, serif;
+  font-size: clamp(2.1rem, 4.5vw, 3.35rem);
+  font-weight: 800;
+  line-height: 1.08;
+  letter-spacing: 0.03em;
+  margin: 0 0 12px 0;
+  background: linear-gradient(180deg, #fffbeb 0%, #fcd34d 55%, #d97706 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+.title-subtitle {
+  font-size: 0.96rem;
+  line-height: 1.5;
+  color: #cbd5e1;
+  max-width: 54ch;
+  margin: 0 auto 24px auto;
+}
+
+.primary-cta {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  background: linear-gradient(180deg, #f59e0b 0%, #b45309 100%);
+  color: #fff;
+  font-family: 'Cinzel', Georgia, serif;
+  font-weight: 800;
+  font-size: 1.12rem;
+  letter-spacing: 0.06em;
+  padding: 14px 36px;
+  border-radius: 10px;
+  border: 1px solid #fde68a;
+  cursor: pointer;
+  box-shadow: 0 8px 24px rgba(245, 158, 11, 0.35);
+  transition: transform 0.15s ease, filter 0.15s ease;
+}
+
+.primary-cta:hover {
+  transform: translateY(-2px);
+  filter: brightness(1.08);
+}
+
+.primary-cta:active {
+  transform: translateY(1px);
+}
+
+.control-strip {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 10px;
+  margin-top: 22px;
+  padding-top: 18px;
+  border-top: 1px solid rgba(148, 163, 184, 0.18);
+}
+
+.keycap-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 0.76rem;
+  color: #cbd5e1;
+  background: rgba(30, 41, 59, 0.85);
+  border: 1px solid rgba(148, 163, 184, 0.28);
+  padding: 5px 10px;
+  border-radius: 6px;
+}
+
+.keycap-badge {
+  font-family: 'JetBrains Mono', monospace;
+  font-weight: 700;
+  font-size: 0.72rem;
+  color: #fde68a;
+  background: rgba(15, 23, 42, 0.95);
+  border: 1px solid rgba(245, 158, 11, 0.4);
+  padding: 2px 6px;
+  border-radius: 4px;
+}
+
+/* Perimeter HUD */
+#hud-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 25;
+  pointer-events: none;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  padding: 14px 16px;
+}
+
+#hud-overlay.hidden-overlay {
+  display: none;
+}
+
+.hud-top-bar {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 12px;
+  width: 100%;
+}
+
+.hud-cluster {
+  pointer-events: auto;
+  background: var(--bg-obsidian);
+  border: 1px solid var(--border-gold);
+  border-radius: 10px;
+  padding: 8px 12px;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.55);
+}
+
+.hud-stat {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  font-size: 0.8rem;
+  font-weight: 600;
+}
+
+.hud-stat-label {
+  color: var(--text-muted);
+  font-size: 0.7rem;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.hp-bar-track {
+  width: 110px;
+  height: 9px;
+  background: rgba(30, 41, 59, 0.95);
+  border: 1px solid rgba(255, 255, 255, 0.16);
+  border-radius: 5px;
+  overflow: hidden;
+}
+
+.hp-bar-fill {
+  height: 100%;
+  background: linear-gradient(90deg, #ef4444 0%, #f97316 100%);
+  transition: width 0.2s ease;
+}
+
+.hud-icon-btn {
+  pointer-events: auto;
+  background: rgba(30, 41, 59, 0.9);
+  color: var(--text-ivory);
+  border: 1px solid rgba(148, 163, 184, 0.35);
+  border-radius: 8px;
+  padding: 6px 10px;
+  font-size: 0.76rem;
+  font-weight: 600;
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  cursor: pointer;
+}
+
+.hud-icon-btn:hover {
+  border-color: var(--accent-gold);
+  color: #fde68a;
+}
+
+/* Bottom Command Dock */
+.hud-bottom-bar {
+  display: flex;
+  justify-content: center;
+  align-items: flex-end;
+  width: 100%;
+  padding-bottom: 2px;
+}
+
+.command-dock {
+  pointer-events: auto;
+  background: var(--bg-obsidian);
+  border: 1px solid var(--border-gold);
+  border-radius: 12px;
+  padding: 6px 8px;
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 6px;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.65);
+}
+
+.dock-btn {
+  background: rgba(30, 41, 59, 0.85);
+  color: #e2e8f0;
+  border: 1px solid rgba(148, 163, 184, 0.25);
+  border-radius: 8px;
+  padding: 7px 12px;
+  font-size: 0.76rem;
+  font-weight: 600;
+  text-transform: none;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  cursor: pointer;
+  transition: background 0.15s ease, border-color 0.15s ease;
+}
+
+.dock-btn:hover,
+.dock-btn.active-tab {
+  background: rgba(245, 158, 11, 0.22);
+  border-color: var(--accent-gold);
+  color: #fef3c7;
+}
+
+/* Toast Notification Banner */
+#toast-banner {
+  position: fixed;
+  top: 72px;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 30;
+  pointer-events: none;
+  background: rgba(15, 23, 42, 0.94);
+  border: 1px solid var(--accent-gold);
+  color: #fef3c7;
+  padding: 7px 16px;
+  border-radius: 8px;
+  font-size: 0.82rem;
+  font-weight: 600;
+  opacity: 0;
+  transition: opacity 0.2s ease;
+}
+
+#toast-banner.visible {
+  opacity: 1;
+}
+
+/* Modal Command Drawer */
+#modal-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 45;
+  background: rgba(4, 7, 15, 0.72);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 20px;
+}
+
+#modal-overlay.hidden-overlay {
+  display: none;
+}
+
+.modal-window {
+  width: 100%;
+  max-width: 920px;
+  max-height: 84dvh;
+  background: var(--bg-panel);
+  border: 1px solid var(--border-gold);
+  border-radius: 14px;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  box-shadow: 0 24px 64px rgba(0, 0, 0, 0.85);
+}
+
+.modal-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 14px 20px;
+  border-bottom: 1px solid rgba(148, 163, 184, 0.2);
+  background: rgba(11, 15, 25, 0.95);
+}
+
+.modal-title {
+  font-family: 'Cinzel', Georgia, serif;
+  font-size: 1.15rem;
+  font-weight: 700;
+  color: #fde68a;
+  margin: 0;
+}
+
+.modal-body {
+  padding: 18px 20px;
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.panel-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+  gap: 12px;
+}
+
+.panel-card {
+  background: rgba(15, 23, 42, 0.9);
+  border: 1px solid rgba(148, 163, 184, 0.22);
+  border-radius: 10px;
+  padding: 14px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.action-btn {
+  background: linear-gradient(180deg, #d97706 0%, #92400e 100%);
+  color: #fff;
+  border: 1px solid rgba(253, 230, 138, 0.45);
+  border-radius: 7px;
+  padding: 8px 12px;
+  font-size: 0.78rem;
+  font-weight: 600;
+  text-transform: none;
+  cursor: pointer;
+}
+
+.action-btn:hover:not(:disabled) {
+  filter: brightness(1.1);
+}
+
+.action-btn:disabled {
+  opacity: 0.45;
+  cursor: not-allowed;
+}
+
+.action-btn-secondary {
+  background: rgba(30, 41, 59, 0.95);
+  color: #e2e8f0;
+  border: 1px solid rgba(148, 163, 184, 0.35);
+  border-radius: 7px;
+  padding: 7px 12px;
+  font-size: 0.76rem;
+  font-weight: 600;
+  text-transform: none;
+  cursor: pointer;
+}
+
+.action-btn-secondary:hover {
+  border-color: var(--accent-cyan);
+  color: #fff;
+}
+
+.input-field,
+.select-field,
+.textarea-field {
+  width: 100%;
+  background: rgba(7, 11, 20, 0.92);
+  color: var(--text-ivory);
+  border: 1px solid rgba(148, 163, 184, 0.32);
+  border-radius: 7px;
+  padding: 8px 10px;
+  font-size: 0.82rem;
+  font-family: inherit;
+}
+
+/* Confirmation Dialog for Destructive / Mutating Workspace Actions */
+#confirm-dialog {
+  position: fixed;
+  inset: 0;
+  z-index: 60;
+  background: rgba(4, 7, 15, 0.82);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 20px;
+}
+
+#confirm-dialog.hidden-overlay {
+  display: none;
+}

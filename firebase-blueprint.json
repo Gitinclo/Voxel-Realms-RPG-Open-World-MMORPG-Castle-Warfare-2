@@ -1,0 +1,134 @@
+{
+  "entities": {
+    "RealmSave": {
+      "title": "RealmSave",
+      "description": "Persistent player kingdom, castle warfare, and four-path cultivation state.",
+      "type": "object",
+      "properties": {
+        "ownerId": {
+          "type": "string",
+          "description": "Firebase Auth UID of the player who owns this realm save.",
+          "minLength": 1,
+          "maxLength": 128,
+          "pattern": "^[a-zA-Z0-9_\\-]+$"
+        },
+        "lordName": {
+          "type": "string",
+          "description": "Display name of the cultivator lord.",
+          "minLength": 1,
+          "maxLength": 60
+        },
+        "clanTag": {
+          "type": "string",
+          "description": "Heraldic clan tag (2 to 6 uppercase characters).",
+          "minLength": 2,
+          "maxLength": 6,
+          "pattern": "^[A-Z0-9]+$"
+        },
+        "castleLevel": {
+          "type": "integer",
+          "description": "Citadel level from 0 to 100."
+        },
+        "cultivationRealmIndex": {
+          "type": "integer",
+          "description": "Current Qi cultivation realm index from 0 to 22."
+        },
+        "cultivationLayer": {
+          "type": "integer",
+          "description": "Current cultivation layer from 1 to 9."
+        },
+        "karmaValue": {
+          "type": "integer",
+          "description": "Karma score (negative for Red-Name Fiend, non-negative for Innocent/Justice)."
+        },
+        "powerRatingStr": {
+          "type": "string",
+          "description": "Formatted or serialized BigInt total kingdom might.",
+          "minLength": 1,
+          "maxLength": 64
+        },
+        "stateJson": {
+          "type": "string",
+          "description": "Compact serialized snapshot of resources, troops, and cultivation progress.",
+          "minLength": 2,
+          "maxLength": 20000
+        },
+        "createdAt": {
+          "type": "string",
+          "format": "date-time",
+          "description": "Server timestamp when the realm save was first created."
+        },
+        "updatedAt": {
+          "type": "string",
+          "format": "date-time",
+          "description": "Server timestamp when the realm save was last updated."
+        }
+      },
+      "required": [
+        "ownerId",
+        "lordName",
+        "clanTag",
+        "castleLevel",
+        "cultivationRealmIndex",
+        "cultivationLayer",
+        "karmaValue",
+        "powerRatingStr",
+        "stateJson",
+        "createdAt",
+        "updatedAt"
+      ]
+    },
+    "BattleChronicle": {
+      "title": "BattleChronicle",
+      "description": "Recorded battle, rally, or breakthrough log entry owned by a player.",
+      "type": "object",
+      "properties": {
+        "ownerId": {
+          "type": "string",
+          "description": "Firebase Auth UID of the chronicle author.",
+          "minLength": 1,
+          "maxLength": 128,
+          "pattern": "^[a-zA-Z0-9_\\-]+$"
+        },
+        "title": {
+          "type": "string",
+          "description": "Battle or breakthrough headline.",
+          "minLength": 1,
+          "maxLength": 140
+        },
+        "summary": {
+          "type": "string",
+          "description": "Detailed combat or cultivation outcome.",
+          "minLength": 1,
+          "maxLength": 2000
+        },
+        "status": {
+          "type": "string",
+          "enum": ["active", "archived"],
+          "description": "Lifecycle status of the chronicle entry."
+        },
+        "createdAt": {
+          "type": "string",
+          "format": "date-time",
+          "description": "Server timestamp of creation."
+        },
+        "updatedAt": {
+          "type": "string",
+          "format": "date-time",
+          "description": "Server timestamp of last update."
+        }
+      },
+      "required": ["ownerId", "title", "summary", "status", "createdAt", "updatedAt"]
+    }
+  },
+  "firestore": {
+    "/realm_saves/{saveId}": {
+      "schema": { "$ref": "#/entities/RealmSave" },
+      "description": "Stores each authenticated user's realm save document (saveId == request.auth.uid)."
+    },
+    "/realm_saves/{saveId}/chronicles/{chronicleId}": {
+      "schema": { "$ref": "#/entities/BattleChronicle" },
+      "description": "Subcollection of battle and cultivation chronicles belonging to a realm save."
+    }
+  }
+}

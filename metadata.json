@@ -1,0 +1,6 @@
+{
+  "name": "Voxel Realms XR: Open World MMORPG & Castle Warfare",
+  "description": "Immersive WebXR & 3D Open-World Voxel MMORPG with Castle Warfare (Lv 0-100, 1000T capacity), Four-Path Immortal Cultivation, Bioscience & AI Command Center, and Google Workspace sync.",
+  "requestFramePermissions": ["camera", "microphone"],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
