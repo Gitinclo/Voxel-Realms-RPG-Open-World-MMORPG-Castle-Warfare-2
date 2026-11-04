@@ -260,6 +260,52 @@ export async function listBattleChroniclesFromFirestore(): Promise<
   }
 }
 
+export async function saveSupportTicketToFirestore(params: {
+  ticketId: string;
+  senderName: string;
+  senderEmail: string;
+  category: 'gm_assistance' | 'moderation_appeal' | 'bug_report' | 'security_alert';
+  subject: string;
+  message: string;
+}): Promise<boolean> {
+  const user = auth.currentUser;
+  if (!user) return false;
+  const safeTicketId = params.ticketId.replace(/[^a-zA-Z0-9_-]/g, '').slice(0, 128) || `ticket_${Date.now()}`;
+  const path = `support_tickets/${safeTicketId}`;
+  try {
+    await setDoc(doc(db, 'support_tickets', safeTicketId), {
+      ownerId: user.uid.slice(0, 128),
+      senderName: (params.senderName || 'Sovereign Cultivator').slice(0, 80),
+      senderEmail: (params.senderEmail || user.email || 'player@voxelrealms.local').slice(0, 120),
+      recipientEmail: 'creatergame31@gmail.com',
+      category: params.category,
+      subject: (params.subject || 'GM Inquiry').slice(0, 140),
+      message: (params.message || 'Assistance requested.').slice(0, 2000),
+      status: 'open',
+      createdAt: serverTimestamp(),
+      updatedAt: serverTimestamp(),
+    });
+    return true;
+  } catch (error) {
+    handleFirestoreError(error, OperationType.CREATE, path);
+  }
+}
+
+export async function listAllRealmSavesForAdmin(): Promise<Array<RealmCloudSavePayload & { id: string }>> {
+  const user = auth.currentUser;
+  if (!user) return [];
+  const path = 'realm_saves';
+  try {
+    const snap = await getDocs(collection(db, 'realm_saves'));
+    return snap.docs.map((d) => ({
+      id: d.id,
+      ...(d.data() as RealmCloudSavePayload),
+    }));
+  } catch (error) {
+    handleFirestoreError(error, OperationType.LIST, path);
+  }
+}
+
 // ============================================================================
 // 1P GOOGLE WORKSPACE INTEGRATIONS (12 SERVICES)
 // ============================================================================

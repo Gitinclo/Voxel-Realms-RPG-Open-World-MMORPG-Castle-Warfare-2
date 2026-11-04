@@ -119,16 +119,95 @@
         }
       },
       "required": ["ownerId", "title", "summary", "status", "createdAt", "updatedAt"]
+    },
+    "SupportTicket": {
+      "title": "SupportTicket",
+      "description": "Direct player-to-admin GM and Moderator support/contact dispatch routed to creatergame31@gmail.com.",
+      "type": "object",
+      "properties": {
+        "ownerId": {
+          "type": "string",
+          "description": "Firebase Auth UID of the player submitting the contact dispatch.",
+          "minLength": 1,
+          "maxLength": 128,
+          "pattern": "^[a-zA-Z0-9_\\-]+$"
+        },
+        "senderName": {
+          "type": "string",
+          "description": "Display name of the player submitting the ticket.",
+          "minLength": 1,
+          "maxLength": 80
+        },
+        "senderEmail": {
+          "type": "string",
+          "description": "Contact email of the sender.",
+          "minLength": 3,
+          "maxLength": 120
+        },
+        "recipientEmail": {
+          "type": "string",
+          "enum": ["creatergame31@gmail.com"],
+          "description": "Official Sovereign Admin / GM / Moderator contact address."
+        },
+        "category": {
+          "type": "string",
+          "enum": ["gm_assistance", "moderation_appeal", "bug_report", "security_alert"],
+          "description": "Support or moderation category."
+        },
+        "subject": {
+          "type": "string",
+          "description": "Ticket subject line.",
+          "minLength": 1,
+          "maxLength": 140
+        },
+        "message": {
+          "type": "string",
+          "description": "Detailed inquiry or moderation appeal message.",
+          "minLength": 1,
+          "maxLength": 2000
+        },
+        "status": {
+          "type": "string",
+          "enum": ["open", "resolved"],
+          "description": "Ticket resolution status."
+        },
+        "createdAt": {
+          "type": "string",
+          "format": "date-time",
+          "description": "Server timestamp of creation."
+        },
+        "updatedAt": {
+          "type": "string",
+          "format": "date-time",
+          "description": "Server timestamp of last update."
+        }
+      },
+      "required": [
+        "ownerId",
+        "senderName",
+        "senderEmail",
+        "recipientEmail",
+        "category",
+        "subject",
+        "message",
+        "status",
+        "createdAt",
+        "updatedAt"
+      ]
     }
   },
   "firestore": {
     "/realm_saves/{saveId}": {
       "schema": { "$ref": "#/entities/RealmSave" },
-      "description": "Stores each authenticated user's realm save document (saveId == request.auth.uid)."
+      "description": "Stores each authenticated user's realm save document (saveId == request.auth.uid), with full GM/Admin oversight for creatergame31@gmail.com."
     },
     "/realm_saves/{saveId}/chronicles/{chronicleId}": {
       "schema": { "$ref": "#/entities/BattleChronicle" },
       "description": "Subcollection of battle and cultivation chronicles belonging to a realm save."
+    },
+    "/support_tickets/{ticketId}": {
+      "schema": { "$ref": "#/entities/SupportTicket" },
+      "description": "Direct GM, Admin, and Moderator contact dispatches routed to creatergame31@gmail.com."
     }
   }
 }

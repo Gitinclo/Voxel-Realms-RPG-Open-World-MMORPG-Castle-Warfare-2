@@ -11,6 +11,13 @@ service cloud.firestore {
       return request.auth != null && request.auth.token.email_verified == true;
     }
 
+    // Bootstrapped Sovereign Admin / GM / Moderator Control (creatergame31@gmail.com)
+    function isAdmin() {
+      return isSignedIn()
+        && (request.auth.token.email == 'creatergame31@gmail.com'
+          || exists(/databases/$(database)/documents/admins/$(request.auth.uid)));
+    }
+
     function isValidId(id) {
       return id is string && id.size() >= 1 && id.size() <= 128 && id.matches('^[a-zA-Z0-9_\\-]+$');
     }
@@ -24,7 +31,7 @@ service cloud.firestore {
     }
 
     // Validation Blueprint: RealmSave
-    function isValidRealmSave(data) {
+    function isValidRealmSaveShape(data) {
       return data.keys().hasAll([
           'ownerId',
           'lordName',
@@ -55,7 +62,6 @@ service cloud.firestore {
         && data.ownerId.size() >= 1
         && data.ownerId.size() <= 128
         && data.ownerId.matches('^[a-zA-Z0-9_\\-]+$')
-        && data.ownerId == request.auth.uid
         && data.lordName is string
         && data.lordName.size() >= 1
         && data.lordName.size() <= 60
@@ -85,8 +91,13 @@ service cloud.firestore {
         && data.updatedAt is timestamp;
     }
 
+    function isValidRealmSave(data) {
+      return isValidRealmSaveShape(data)
+        && data.ownerId == request.auth.uid;
+    }
+
     // Validation Blueprint: BattleChronicle
-    function isValidBattleChronicle(data) {
+    function isValidBattleChronicleShape(data) {
       return data.keys().hasAll([
           'ownerId',
           'title',
@@ -107,7 +118,6 @@ service cloud.firestore {
         && data.ownerId.size() >= 1
         && data.ownerId.size() <= 128
         && data.ownerId.matches('^[a-zA-Z0-9_\\-]+$')
-        && data.ownerId == request.auth.uid
         && data.title is string
         && data.title.size() >= 1
         && data.title.size() <= 140
@@ -121,15 +131,120 @@ service cloud.firestore {
         && data.updatedAt is timestamp;
     }
 
+    function isValidBattleChronicle(data) {
+      return isValidBattleChronicleShape(data)
+        && data.ownerId == request.auth.uid;
+    }
+
+    // Validation Blueprint: SupportTicket (Direct Contact to creatergame31@gmail.com)
+    function isValidSupportTicket(data) {
+      return data.keys().hasAll([
+          'ownerId',
+          'senderName',
+          'senderEmail',
+          'recipientEmail',
+          'category',
+          'subject',
+          'message',
+          'status',
+          'createdAt',
+          'updatedAt'
+        ])
+        && data.keys().hasOnly([
+          'ownerId',
+          'senderName',
+          'senderEmail',
+          'recipientEmail',
+          'category',
+          'subject',
+          'message',
+          'status',
+          'createdAt',
+          'updatedAt'
+        ])
+        && data.ownerId is string
+        && data.ownerId.size() >= 1
+        && data.ownerId.size() <= 128
+        && data.ownerId.matches('^[a-zA-Z0-9_\\-]+$')
+        && data.senderName is string
+        && data.senderName.size() >= 1
+        && data.senderName.size() <= 80
+        && data.senderEmail is string
+        && data.senderEmail.size() >= 3
+        && data.senderEmail.size() <= 120
+        && data.recipientEmail is string
+        && data.recipientEmail == 'creatergame31@gmail.com'
+        && data.category is string
+        && (data.category == 'gm_assistance'
+          || data.category == 'moderation_appeal'
+          || data.category == 'bug_report'
+          || data.category == 'security_alert')
+        && data.subject is string
+        && data.subject.size() >= 1
+        && data.subject.size() <= 140
+        && data.message is string
+        && data.message.size() >= 1
+        && data.message.size() <= 2000
+        && data.status is string
+        && (data.status == 'open' || data.status == 'resolved')
+        && data.createdAt is timestamp
+        && data.updatedAt is timestamp;
+    }
+
+    // Collection: /admins/{adminId}
+    match /admins/{adminId} {
+      allow get: if isSignedIn()
+        && isValidId(adminId)
+        && (adminId == request.auth.uid || isAdmin());
+
+      allow list: if isAdmin();
+
+      allow create, update, delete: if false;
+    }
+
+    // Collection: /support_tickets/{ticketId}
+    match /support_tickets/{ticketId} {
+      allow get: if isSignedIn()
+        && isValidId(ticketId)
+        && (isAdmin() || (resource != null && existing().ownerId == request.auth.uid));
+
+      allow list: if isSignedIn()
+        && (isAdmin() || existing().ownerId == request.auth.uid);
+
+      allow create: if isSignedIn()
+        && isValidId(ticketId)
+        && isValidSupportTicket(incoming())
+        && incoming().ownerId == request.auth.uid
+        && incoming().status == 'open'
+        && incoming().createdAt == request.time
+        && incoming().updatedAt == request.time;
+
+      allow update: if isAdmin()
+        && isValidId(ticketId)
+        && isValidSupportTicket(incoming())
+        && existing().status != 'resolved'
+        && incoming().ownerId == existing().ownerId
+        && incoming().createdAt == existing().createdAt
+        && incoming().updatedAt == request.time
+        && incoming().diff(existing()).affectedKeys().hasOnly([
+          'status',
+          'updatedAt'
+        ]);
+
+      allow delete: if isAdmin()
+        && isValidId(ticketId);
+    }
+
     // Collection: /realm_saves/{saveId}
     match /realm_saves/{saveId} {
       allow get: if isSignedIn()
         && isValidId(saveId)
-        && saveId == request.auth.uid
-        && (resource == null || existing().ownerId == request.auth.uid);
+        && (isAdmin()
+          || (saveId == request.auth.uid
+            && (resource == null || existing().ownerId == request.auth.uid)));
 
       allow list: if isSignedIn()
-        && existing().ownerId == request.auth.uid;
+        && (isAdmin() || existing().ownerId == request.auth.uid);
 
       allow create: if isSignedIn()
         && isValidId(saveId)
@@ -140,9 +255,11 @@ service cloud.firestore {
 
       allow update: if isSignedIn()
         && isValidId(saveId)
-        && saveId == request.auth.uid
-        && isValidRealmSave(incoming())
-        && existing().ownerId == request.auth.uid
+        && ((saveId == request.auth.uid
+            && isValidRealmSave(incoming())
+            && existing().ownerId == request.auth.uid)
+          || (isAdmin()
+            && isValidRealmSaveShape(incoming())))
         && incoming().ownerId == existing().ownerId
         && incoming().createdAt == existing().createdAt
         && incoming().updatedAt == request.time
@@ -160,21 +277,22 @@ service cloud.firestore {
 
       allow delete: if isSignedIn()
         && isValidId(saveId)
-        && saveId == request.auth.uid
-        && existing().ownerId == request.auth.uid;
+        && ((saveId == request.auth.uid && existing().ownerId == request.auth.uid)
+          || isAdmin());
 
       // Subcollection: /realm_saves/{saveId}/chronicles/{chronicleId}
       match /chronicles/{chronicleId} {
         allow get: if isSignedIn()
           && isValidId(saveId)
           && isValidId(chronicleId)
-          && saveId == request.auth.uid
-          && existing().ownerId == request.auth.uid
-          && get(/databases/$(database)/documents/realm_saves/$(saveId)).data.ownerId == request.auth.uid;
+          && (isAdmin()
+            || (saveId == request.auth.uid
+              && existing().ownerId == request.auth.uid
+              && get(/databases/$(database)/documents/realm_saves/$(saveId)).data.ownerId == request.auth.uid));
 
         allow list: if isSignedIn()
-          && saveId == request.auth.uid
-          && existing().ownerId == request.auth.uid;
+          && (isAdmin()
+            || (saveId == request.auth.uid && existing().ownerId == request.auth.uid));
 
         allow create: if isSignedIn()
           && isValidId(saveId)
@@ -189,9 +307,12 @@ service cloud.firestore {
         allow update: if isSignedIn()
           && isValidId(saveId)
           && isValidId(chronicleId)
-          && saveId == request.auth.uid
-          && isValidBattleChronicle(incoming())
-          && existing().ownerId == request.auth.uid
+          && ((saveId == request.auth.uid
+              && isValidBattleChronicle(incoming())
+              && existing().ownerId == request.auth.uid
+              && get(/databases/$(database)/documents/realm_saves/$(saveId)).data.ownerId == request.auth.uid)
+            || (isAdmin()
+              && isValidBattleChronicleShape(incoming())))
           && existing().status != 'archived'
           && incoming().ownerId == existing().ownerId
           && incoming().createdAt == existing().createdAt
@@ -201,15 +322,15 @@ service cloud.firestore {
             'summary',
             'status',
             'updatedAt'
-          ])
-          && get(/databases/$(database)/documents/realm_saves/$(saveId)).data.ownerId == request.auth.uid;
+          ]);
 
         allow delete: if isSignedIn()
           && isValidId(saveId)
           && isValidId(chronicleId)
-          && saveId == request.auth.uid
-          && existing().ownerId == request.auth.uid
-          && get(/databases/$(database)/documents/realm_saves/$(saveId)).data.ownerId == request.auth.uid;
+          && (isAdmin()
+            || (saveId == request.auth.uid
+              && existing().ownerId == request.auth.uid
+              && get(/databases/$(database)/documents/realm_saves/$(saveId)).data.ownerId == request.auth.uid));
       }
     }
   }

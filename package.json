@@ -20,6 +20,7 @@
     "@pmndrs/uikit": "^1.0.64",
     "@preact/signals-core": "^1.14.0",
     "@sparkjsdev/spark": "^2.1.0",
+    "d3": "^7.9.2",
     "express": "^5.3.0",
     "firebase": "^13.1.0",
     "lit": "^3.3.1",
@@ -35,6 +36,7 @@
   },
   "devDependencies": {
     "@firebase/eslint-plugin-security-rules": "^0.0.2",
+    "@types/d3": "^7.4.3",
     "@types/dom-speech-recognition": "^0.0.7",
     "@types/express": "^5.0.6",
     "@types/node": "^25.0.8",
