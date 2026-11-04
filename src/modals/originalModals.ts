@@ -2520,5 +2520,77 @@ export function renderModalContent(
         }
       );
     });
+    return;
+  }
+
+  if (drawer === 'readme') {
+    titleEl.textContent = `📖 README.MD — VOXEL REALMS XR ARCHITECTURE & ADMIN DOCUMENTATION`;
+    bodyEl.innerHTML = `
+      <div class="panel-card" data-testid="readme-modal-card" style="background:linear-gradient(135deg,rgba(15,23,42,0.96),rgba(30,27,75,0.88));border:1px solid rgba(56,189,248,0.45);margin-bottom:12px;">
+        <div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:8px;">
+          <div>
+            <div class="font-cinzel" style="font-size:1.05rem;font-weight:900;color:#fde68a;">
+              Voxel Realms XR: Open World MMORPG & Castle Warfare
+            </div>
+            <div style="font-size:0.78rem;color:#cbd5e1;margin-top:2px;">
+              Three.js · XR Blocks (<code>xrblocks@0.24.0</code>) · D3.js · Cloud Firestore · Express + Vite
+            </div>
+          </div>
+          <span class="font-mono-num" style="padding:4px 10px;border-radius:999px;background:rgba(16,185,129,0.2);border:1px solid #34d399;color:#6ee7b7;font-size:0.72rem;font-weight:800;">
+            System Build v${app.systemUpdateVersion || 1}.0 · File: /README.md
+          </span>
+        </div>
+      </div>
+
+      <div class="panel-grid" style="margin-bottom:12px;">
+        <div class="panel-card" style="border-color:rgba(251,191,36,0.45);">
+          <strong style="color:#fef08a;font-size:0.88rem;">⚡ Sovereign Administration, GM, Admin & Moderator Control</strong>
+          <div style="font-size:0.76rem;color:#cbd5e1;line-height:1.5;margin-top:6px;">
+            • <strong>Super Administrator / Grand GM / Lead Moderator</strong>: <code style="color:#6ee7b7;">${SUPER_ADMIN_EMAIL}</code><br/>
+            • <strong>Official Contact & Support</strong>: <a href="mailto:${SUPER_ADMIN_EMAIL}" style="color:#38bdf8;font-weight:800;">${SUPER_ADMIN_EMAIL}</a><br/>
+            • <strong>Global System Update (<code>Update All</code>)</strong>: Synchronizes Citadel Keep (+5 Lv), +5.0M Resources, +750K T20 Immortal Legions, 4-Path Cultivation, D3.js Growth Chronicle, Heroes, and Clan Tech.<br/>
+            • <strong>Firestore Security (<code>firestore.rules</code>)</strong>: Hardware-enforced <code>isAdmin()</code> rule granting verified <code>${SUPER_ADMIN_EMAIL}</code> full governance across <code>/saves/{uid}</code> and <code>/support_tickets/{ticketId}</code>.
+          </div>
+        </div>
+
+        <div class="panel-card" style="border-color:rgba(56,189,248,0.45);">
+          <strong style="color:#38bdf8;font-size:0.88rem;">📈 Four-Path Cultivation & D3.js Growth Chronicle</strong>
+          <div style="font-size:0.76rem;color:#cbd5e1;line-height:1.5;margin-top:6px;">
+            • <strong>23 Immortal Realms × 9 Layers</strong>: Spans Mortal Foundation, Immortal Ascension, Primordial Chaos, and Ultimate Origin (Dao Creator).<br/>
+            • <strong>Four Simultaneous Paths</strong>: 🌬️ Qi Essence, 🩸 Sacred Body, 👁️ Divine Soul, and 🧠 Dao Heart (Mind).<br/>
+            • <strong>D3.js Multi-Line & Area Chart (<code>src/modals/cultivationChart.ts</code>)</strong>: Renders Stage Score (<code>RealmIndex × 9 + Layer</code>) across secluded meditation years with Era threshold bands and interactive tooltips.
+          </div>
+        </div>
+      </div>
+
+      <div class="panel-grid" style="margin-bottom:12px;">
+        <div class="panel-card">
+          <strong style="color:#f43f5e;font-size:0.88rem;">🏰 Citadel Keep (Lv. 1–100) & T1–T20 Combined-Arms Warfare</strong>
+          <div style="font-size:0.76rem;color:#cbd5e1;line-height:1.5;margin-top:6px;">
+            • <strong>6 Architectural Voxel Eras</strong>: Frontier Timber Fort → Omniversal Sovereign Citadel.<br/>
+            • <strong>Combat Counter Triangle</strong>: 🛡️ Shieldbearers beat 🏹 Shooters · 🏹 Shooters beat 💣 Bombers · 💣 Bombers beat 🛡️ Shieldbearers.<br/>
+            • <strong>Clan Territory & Live Rankings</strong>: Outpost sieges, 4-branch Alliance Tech Tree, and live power-sorted Global Leaderboard.
+          </div>
+        </div>
+
+        <div class="panel-card">
+          <strong style="color:#a78bfa;font-size:0.88rem;">🧬 Bioscience 3D PDB, Weather Rituals & World AI</strong>
+          <div style="font-size:0.76rem;color:#cbd5e1;line-height:1.5;margin-top:6px;">
+            • <strong>AlphaFold / RCSB PDB 3D Viewer</strong>: Inspect <code>TP53</code>, <code>BRCA1</code>, <code>EGFR</code>, and <code>CRISPR-Cas9</code> molecular structures.<br/>
+            • <strong>Autonomous World AI Director (Lv. 1–1000)</strong>: Simulates faction diplomacy, monster migrations, and Radiant Quests.<br/>
+            • <strong>Cloud & Workspace</strong>: Firebase Cloud Save + Google Docs/Sheets/Slides/Calendar/Tasks/Forms/Meet integration.
+          </div>
+        </div>
+      </div>
+
+      <div class="panel-card" style="background:#020617;border-color:#334155;">
+        <strong style="color:#6ee7b7;font-size:0.84rem;">🚀 Quick Commands & Project Structure (<code>/README.md</code>)</strong>
+        <pre class="font-mono-num" style="margin-top:6px;padding:10px;border-radius:10px;background:#0f172a;color:#e2e8f0;font-size:0.72rem;overflow-x:auto;line-height:1.45;">npm install
+npm run dev                                  # Full-stack Express + Vite server on port 3000
+npx tsx --test src/game/*.test.ts            # Run unit test suite (Cultivation, D3 History, Admin RBAC)
+npm run build                                # Compile production bundle</pre>
+      </div>
+    `;
+    return;
   }
 }

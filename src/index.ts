@@ -2075,6 +2075,10 @@ function buildDOMGameShell() {
                   <span>🔄</span>
                   <span>Update All</span>
                 </button>
+                <button type="button" id="hud-readme-btn" data-testid="hud-readme-btn" title="Open README.md Architecture, Features & Admin Documentation" class="font-mono-num" style="font-size:0.66rem;padding:2px 7px;border-radius:6px;background:rgba(15,23,42,0.95);color:#bae6fd;border:1px solid rgba(56,189,248,0.65);font-weight:800;display:inline-flex;align-items:center;gap:4px;cursor:pointer;">
+                  <span>📖</span>
+                  <span>Readme.md</span>
+                </button>
               </div>
               <div class="font-mono-num" style="display:flex;align-items:center;gap:6px;margin-top:2px;font-size:0.72rem;color:#94a3b8;">
                 <span id="hud-player-might" data-testid="hud-player-might" style="color:#34d399;font-weight:800;">1.8M Might</span>
@@ -2260,6 +2264,12 @@ function buildDOMGameShell() {
             <span class="font-cinzel" style="font-size:0.68rem;font-weight:800;">Workspace</span>
             <span class="font-mono-num" style="font-size:0.6rem;color:#818cf8;">Cloud Sync</span>
           </button>
+
+          <button type="button" data-testid="dock-readme-btn" class="more-hub-item" data-drawer="readme" style="padding:8px;border-radius:12px;background:#0f172a;border:1px solid rgba(56,189,248,0.55);color:#bae6fd;display:flex;flex-direction:column;align-items:center;gap:2px;cursor:pointer;">
+            <span style="font-size:1.15rem;">📖</span>
+            <span class="font-cinzel" style="font-size:0.68rem;font-weight:800;">Readme.md</span>
+            <span class="font-mono-num" style="font-size:0.6rem;color:#38bdf8;">Docs & Guide</span>
+          </button>
         </div>
 
         <!-- Zen Mode Collapse Toggle -->
@@ -2368,6 +2378,10 @@ function buildDOMGameShell() {
   });
   document.getElementById('hud-update-all-btn')?.addEventListener('click', () => {
     app.updateAllRealmSystems();
+  });
+  document.getElementById('hud-readme-btn')?.addEventListener('click', () => {
+    sound.playSwing();
+    openDrawer('readme');
   });
   document.querySelectorAll('.hud-res-pill').forEach((btn) => {
     btn.addEventListener('click', () => {
